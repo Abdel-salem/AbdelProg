@@ -1,4 +1,4 @@
-"""Point of Sale tab."""
+"""نقطة البيع."""
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
@@ -12,6 +12,12 @@ from PyQt6.QtGui import QColor, QFont
 
 import database.db as db
 from utils.receipt import ReceiptDialog
+
+PAYMENT_METHOD_AR = {
+    "cash": "نقداً",
+    "card": "بطاقة",
+    "mobile": "محفظة إلكترونية",
+}
 
 
 class CartItem:
@@ -37,6 +43,7 @@ class POSTab(QWidget):
         self._build_ui()
         self._load_products()
         self._load_customers()
+        self._load_recent_sales()
 
     # ──────────────────────────────────────────────────────────
     # UI Construction
@@ -50,22 +57,22 @@ class POSTab(QWidget):
         splitter = QSplitter(Qt.Orientation.Horizontal)
         main_layout.addWidget(splitter)
 
-        # Left: product search + grid
+        # اليسار: بحث المنتج + الجدول
         left_widget = QWidget()
         left_layout = QVBoxLayout(left_widget)
         left_layout.setContentsMargins(0, 0, 0, 0)
 
         search_row = QHBoxLayout()
         self._search_box = QLineEdit()
-        self._search_box.setPlaceholderText("Search product by name or SKU...")
+        self._search_box.setPlaceholderText("بحث عن منتج بالاسم أو الرمز...")
         self._search_box.textChanged.connect(self._filter_products)
-        search_row.addWidget(QLabel("Search:"))
+        search_row.addWidget(QLabel("بحث:"))
         search_row.addWidget(self._search_box)
         left_layout.addLayout(search_row)
 
         self._product_table = QTableWidget()
         self._product_table.setColumnCount(4)
-        self._product_table.setHorizontalHeaderLabels(["Name", "SKU", "Price", "Stock"])
+        self._product_table.setHorizontalHeaderLabels(["الاسم", "رمز المنتج", "السعر", "المخزون"])
         self._product_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         self._product_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self._product_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
@@ -73,35 +80,48 @@ class POSTab(QWidget):
         self._product_table.doubleClicked.connect(self._add_selected_to_cart)
         left_layout.addWidget(self._product_table)
 
-        add_btn = QPushButton("Add to Cart")
+        add_btn = QPushButton("إضافة للسلة")
         add_btn.setObjectName("successBtn")
         add_btn.clicked.connect(self._add_selected_to_cart)
         left_layout.addWidget(add_btn)
 
+        # آخر المبيعات
+        recent_group = QGroupBox("آخر المبيعات")
+        recent_layout = QVBoxLayout(recent_group)
+        self._recent_table = QTableWidget()
+        self._recent_table.setColumnCount(4)
+        self._recent_table.setHorizontalHeaderLabels(["#", "العميل", "الإجمالي", "الوقت"])
+        self._recent_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        self._recent_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self._recent_table.setAlternatingRowColors(True)
+        self._recent_table.setMaximumHeight(170)
+        recent_layout.addWidget(self._recent_table)
+        left_layout.addWidget(recent_group)
+
         splitter.addWidget(left_widget)
 
-        # Right: cart + payment
+        # اليمين: السلة + الدفع
         right_widget = QWidget()
         right_layout = QVBoxLayout(right_widget)
         right_layout.setContentsMargins(0, 0, 0, 0)
 
-        # Customer selector
+        # اختيار العميل
         cust_row = QHBoxLayout()
-        cust_row.addWidget(QLabel("Customer:"))
+        cust_row.addWidget(QLabel("العميل:"))
         self._customer_combo = QComboBox()
         self._customer_combo.setMinimumWidth(200)
         self._customer_combo.setEditable(True)
-        self._customer_combo.lineEdit().setPlaceholderText("Walk-in (optional)")
+        self._customer_combo.lineEdit().setPlaceholderText("بدون عميل (اختياري)")
         cust_row.addWidget(self._customer_combo)
         cust_row.addStretch()
         right_layout.addLayout(cust_row)
 
-        # Cart table
-        cart_group = QGroupBox("Cart")
+        # جدول السلة
+        cart_group = QGroupBox("السلة")
         cart_group_layout = QVBoxLayout(cart_group)
         self._cart_table = QTableWidget()
         self._cart_table.setColumnCount(5)
-        self._cart_table.setHorizontalHeaderLabels(["Product", "Qty", "Unit Price", "Total", ""])
+        self._cart_table.setHorizontalHeaderLabels(["المنتج", "الكمية", "سعر الوحدة", "الإجمالي", ""])
         self._cart_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         self._cart_table.setColumnWidth(1, 70)
         self._cart_table.setColumnWidth(2, 90)
@@ -112,56 +132,56 @@ class POSTab(QWidget):
         cart_group_layout.addWidget(self._cart_table)
         right_layout.addWidget(cart_group)
 
-        # Totals + controls
-        controls_group = QGroupBox("Payment")
+        # الإجماليات + الضوابط
+        controls_group = QGroupBox("الدفع")
         controls_layout = QGridLayout(controls_group)
 
-        controls_layout.addWidget(QLabel("Discount (%):"), 0, 0)
+        controls_layout.addWidget(QLabel("الخصم (%):"), 0, 0)
         self._discount_spin = QDoubleSpinBox()
         self._discount_spin.setRange(0, 100)
         self._discount_spin.setDecimals(1)
         self._discount_spin.valueChanged.connect(self._update_totals)
         controls_layout.addWidget(self._discount_spin, 0, 1)
 
-        controls_layout.addWidget(QLabel("Payment Method:"), 1, 0)
+        controls_layout.addWidget(QLabel("طريقة الدفع:"), 1, 0)
         self._payment_combo = QComboBox()
-        self._payment_combo.addItems(["Cash", "Card", "Mobile"])
+        self._payment_combo.addItems(["نقداً", "بطاقة", "محفظة إلكترونية"])
         controls_layout.addWidget(self._payment_combo, 1, 1)
 
-        controls_layout.addWidget(QLabel("Cash Tendered:"), 2, 0)
+        controls_layout.addWidget(QLabel("المبلغ المدفوع:"), 2, 0)
         self._cash_tendered = QDoubleSpinBox()
         self._cash_tendered.setRange(0, 999999)
         self._cash_tendered.setDecimals(2)
         self._cash_tendered.valueChanged.connect(self._update_change)
         controls_layout.addWidget(self._cash_tendered, 2, 1)
 
-        controls_layout.addWidget(QLabel("Subtotal:"), 3, 0)
-        self._subtotal_label = QLabel("$0.00")
+        controls_layout.addWidget(QLabel("الإجمالي قبل الخصم:"), 3, 0)
+        self._subtotal_label = QLabel("0.00")
         self._subtotal_label.setStyleSheet("font-size:14px; font-weight:bold;")
         controls_layout.addWidget(self._subtotal_label, 3, 1)
 
-        controls_layout.addWidget(QLabel("Discount:"), 4, 0)
-        self._discount_label = QLabel("$0.00")
+        controls_layout.addWidget(QLabel("الخصم:"), 4, 0)
+        self._discount_label = QLabel("0.00")
         controls_layout.addWidget(self._discount_label, 4, 1)
 
-        controls_layout.addWidget(QLabel("TOTAL:"), 5, 0)
-        self._total_label = QLabel("$0.00")
-        self._total_label.setStyleSheet("font-size: 16px; font-weight: bold; color: #1a237e;")
+        controls_layout.addWidget(QLabel("الإجمالي:"), 5, 0)
+        self._total_label = QLabel("0.00")
+        self._total_label.setStyleSheet("font-size: 16px; font-weight: bold; color: #1e3a5f;")
         controls_layout.addWidget(self._total_label, 5, 1)
 
-        controls_layout.addWidget(QLabel("Change:"), 6, 0)
-        self._change_label = QLabel("$0.00")
+        controls_layout.addWidget(QLabel("الباقي:"), 6, 0)
+        self._change_label = QLabel("0.00")
         self._change_label.setStyleSheet("font-size:14px; font-weight:bold; color: #43a047;")
         controls_layout.addWidget(self._change_label, 6, 1)
 
         right_layout.addWidget(controls_group)
 
         btn_row = QHBoxLayout()
-        clear_btn = QPushButton("Clear Cart")
+        clear_btn = QPushButton("مسح السلة")
         clear_btn.setObjectName("dangerBtn")
         clear_btn.clicked.connect(self._clear_cart)
 
-        process_btn = QPushButton("Process Sale")
+        process_btn = QPushButton("إتمام البيع")
         process_btn.setObjectName("successBtn")
         process_btn.clicked.connect(self._process_sale)
 
@@ -187,7 +207,7 @@ class POSTab(QWidget):
             self._product_table.insertRow(row)
             self._product_table.setItem(row, 0, QTableWidgetItem(p["name"]))
             self._product_table.setItem(row, 1, QTableWidgetItem(p.get("sku") or ""))
-            self._product_table.setItem(row, 2, QTableWidgetItem(f"${p['sell_price']:.2f}"))
+            self._product_table.setItem(row, 2, QTableWidgetItem(f"{p['sell_price']:.2f}"))
             stock_item = QTableWidgetItem(f"{p['stock_qty']:.1f} {p.get('unit','pcs')}")
             if p["stock_qty"] <= 0:
                 stock_item.setForeground(QColor("#e53935"))
@@ -198,9 +218,31 @@ class POSTab(QWidget):
 
     def _load_customers(self):
         self._customer_combo.clear()
-        self._customer_combo.addItem("-- Walk-in --", None)
+        self._customer_combo.addItem("-- بدون عميل --", None)
         for c in db.get_all_customers():
             self._customer_combo.addItem(f"{c['name']} ({c.get('phone','') or c.get('email','')})", c["id"])
+
+    def _load_recent_sales(self):
+        self._recent_table.setRowCount(0)
+        try:
+            recent = db.get_recent_sales(5)
+            for s in recent:
+                row = self._recent_table.rowCount()
+                self._recent_table.insertRow(row)
+                self._recent_table.setItem(row, 0, QTableWidgetItem(str(s["id"])))
+                self._recent_table.setItem(row, 1, QTableWidgetItem(s.get("customer_name", "بدون عميل")))
+                amt_item = QTableWidgetItem(f"{s.get('total_amount', 0):,.2f}")
+                amt_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+                self._recent_table.setItem(row, 2, amt_item)
+                dt = s.get("created_at", "")[:16]
+                self._recent_table.setItem(row, 3, QTableWidgetItem(dt))
+        except Exception:
+            pass
+
+    def refresh(self):
+        self._load_products()
+        self._load_customers()
+        self._load_recent_sales()
 
     # ──────────────────────────────────────────────────────────
     # Interactions
@@ -223,22 +265,22 @@ class POSTab(QWidget):
             return
 
         if product["stock_qty"] <= 0:
-            QMessageBox.warning(self, "Out of Stock", f"'{product['name']}' is out of stock.")
+            QMessageBox.warning(self, "نفد المخزون", f"المنتج '{product['name']}' غير متوفر في المخزون.")
             return
 
-        # Ask quantity
+        # طلب الكمية
         qty_dialog = _QuantityDialog(product, self)
         if qty_dialog.exec() != QDialog.DialogCode.Accepted:
             return
         qty = qty_dialog.quantity()
 
-        # Check if already in cart
+        # تحقق من وجود المنتج في السلة
         for item in self._cart:
             if item.product_id == product["id"]:
                 new_qty = item.quantity + qty
                 if new_qty > product["stock_qty"]:
-                    QMessageBox.warning(self, "Insufficient Stock",
-                                        f"Only {product['stock_qty']:.1f} {product.get('unit','pcs')} available.")
+                    QMessageBox.warning(self, "كمية غير كافية",
+                                        f"المتوفر فقط: {product['stock_qty']:.1f} {product.get('unit','pcs')}.")
                     return
                 item.quantity = new_qty
                 self._refresh_cart_table()
@@ -246,8 +288,8 @@ class POSTab(QWidget):
                 return
 
         if qty > product["stock_qty"]:
-            QMessageBox.warning(self, "Insufficient Stock",
-                                f"Only {product['stock_qty']:.1f} {product.get('unit','pcs')} available.")
+            QMessageBox.warning(self, "كمية غير كافية",
+                                f"المتوفر فقط: {product['stock_qty']:.1f} {product.get('unit','pcs')}.")
             return
 
         self._cart.append(CartItem(product, qty))
@@ -265,11 +307,11 @@ class POSTab(QWidget):
             qty_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             self._cart_table.setItem(row, 1, qty_item)
 
-            price_item = QTableWidgetItem(f"${item.unit_price:.2f}")
+            price_item = QTableWidgetItem(f"{item.unit_price:.2f}")
             price_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self._cart_table.setItem(row, 2, price_item)
 
-            total_item = QTableWidgetItem(f"${item.line_total:.2f}")
+            total_item = QTableWidgetItem(f"{item.line_total:.2f}")
             total_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self._cart_table.setItem(row, 3, total_item)
 
@@ -291,20 +333,19 @@ class POSTab(QWidget):
         discount_amt = subtotal * discount_pct / 100
         total = subtotal - discount_amt
 
-        self._subtotal_label.setText(f"${subtotal:.2f}")
-        self._discount_label.setText(f"-${discount_amt:.2f}")
-        self._total_label.setText(f"${total:.2f}")
+        self._subtotal_label.setText(f"{subtotal:.2f}")
+        self._discount_label.setText(f"-{discount_amt:.2f}")
+        self._total_label.setText(f"{total:.2f}")
         self._update_change()
 
     def _update_change(self):
         try:
-            total_text = self._total_label.text().replace("$", "")
-            total = float(total_text)
+            total = float(self._total_label.text())
         except ValueError:
             total = 0.0
         tendered = self._cash_tendered.value()
         change = tendered - total if tendered >= total else 0
-        self._change_label.setText(f"${change:.2f}")
+        self._change_label.setText(f"{change:.2f}")
 
     def _clear_cart(self):
         self._cart.clear()
@@ -315,17 +356,16 @@ class POSTab(QWidget):
 
     def _process_sale(self):
         if not self._cart:
-            QMessageBox.warning(self, "Empty Cart", "Add items to the cart before processing.")
+            QMessageBox.warning(self, "السلة فارغة", "أضف منتجات للسلة قبل إتمام البيع.")
             return
 
-        # Validate stock again
         for item in self._cart:
             fresh = db.get_product_by_id(item.product_id)
             if fresh["stock_qty"] < item.quantity:
                 QMessageBox.critical(
-                    self, "Insufficient Stock",
-                    f"Only {fresh['stock_qty']:.1f} {fresh.get('unit','pcs')} of "
-                    f"'{item.product_name}' available."
+                    self, "كمية غير كافية",
+                    f"المتوفر فقط {fresh['stock_qty']:.1f} {fresh.get('unit','pcs')} من "
+                    f"'{item.product_name}'."
                 )
                 return
 
@@ -333,7 +373,12 @@ class POSTab(QWidget):
         discount_pct = self._discount_spin.value()
         discount_amt = subtotal * discount_pct / 100
         total = subtotal - discount_amt
-        payment_method = self._payment_combo.currentText().lower()
+
+        # تحويل طريقة الدفع العربية إلى الإنجليزية
+        pm_text = self._payment_combo.currentText()
+        pm_map = {"نقداً": "cash", "بطاقة": "card", "محفظة إلكترونية": "mobile"}
+        payment_method = pm_map.get(pm_text, "cash")
+
         customer_id = self._customer_combo.currentData()
 
         items_data = [
@@ -355,7 +400,6 @@ class POSTab(QWidget):
         )
 
         if customer_id:
-            # 1 point per dollar
             db.add_loyalty_points(customer_id, int(total))
 
         sale, sale_items = db.get_sale_with_items(sale_id)
@@ -365,23 +409,24 @@ class POSTab(QWidget):
         receipt_dlg.exec()
 
         self._clear_cart()
-        self._load_products()  # refresh stock display
+        self._load_products()
+        self._load_recent_sales()
 
 
 # ──────────────────────────────────────────────────────────────
-# Helper Dialog: enter quantity
+# حوار إدخال الكمية
 # ──────────────────────────────────────────────────────────────
 
 class _QuantityDialog(QDialog):
     def __init__(self, product: dict, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Enter Quantity")
+        self.setWindowTitle("إدخال الكمية")
         self.setFixedSize(300, 160)
         layout = QVBoxLayout(self)
 
         layout.addWidget(QLabel(f"<b>{product['name']}</b>"))
-        layout.addWidget(QLabel(f"Available: {product['stock_qty']:.1f} {product.get('unit','pcs')}"))
-        layout.addWidget(QLabel(f"Price: ${product['sell_price']:.2f}"))
+        layout.addWidget(QLabel(f"المتوفر: {product['stock_qty']:.1f} {product.get('unit','pcs')}"))
+        layout.addWidget(QLabel(f"السعر: {product['sell_price']:.2f}"))
 
         self._spin = QDoubleSpinBox()
         self._spin.setRange(0.01, product["stock_qty"])
@@ -390,10 +435,10 @@ class _QuantityDialog(QDialog):
         layout.addWidget(self._spin)
 
         btn_row = QHBoxLayout()
-        ok_btn = QPushButton("Add to Cart")
+        ok_btn = QPushButton("إضافة للسلة")
         ok_btn.setObjectName("successBtn")
         ok_btn.clicked.connect(self.accept)
-        cancel_btn = QPushButton("Cancel")
+        cancel_btn = QPushButton("إلغاء")
         cancel_btn.setObjectName("secondaryBtn")
         cancel_btn.clicked.connect(self.reject)
         btn_row.addWidget(ok_btn)

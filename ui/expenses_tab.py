@@ -1,4 +1,4 @@
-"""Expenses tab — log and manage operating expenses."""
+"""تبويب المصروفات — تسجيل وإدارة المصروفات التشغيلية."""
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
@@ -11,7 +11,7 @@ from PyQt6.QtCore import Qt, QDate
 import database.db as db
 
 
-EXPENSE_CATEGORIES = ["Rent", "Utilities", "Salaries", "Supplies", "Marketing", "Other"]
+EXPENSE_CATEGORIES = ["إيجار", "مرافق", "رواتب", "مستلزمات", "تسويق", "أخرى"]
 
 
 class ExpensesTab(QWidget):
@@ -25,19 +25,19 @@ class ExpensesTab(QWidget):
         layout.setContentsMargins(12, 12, 12, 12)
 
         toolbar = QHBoxLayout()
-        add_btn = QPushButton("Add Expense")
+        add_btn = QPushButton("إضافة مصروف")
         add_btn.setObjectName("successBtn")
         add_btn.clicked.connect(self._add_expense)
-        edit_btn = QPushButton("Edit")
+        edit_btn = QPushButton("تعديل")
         edit_btn.clicked.connect(self._edit_expense)
-        del_btn = QPushButton("Delete")
+        del_btn = QPushButton("حذف")
         del_btn.setObjectName("dangerBtn")
         del_btn.clicked.connect(self._delete_expense)
 
         self._search = QLineEdit()
-        self._search.setPlaceholderText("Filter by category or description...")
+        self._search.setPlaceholderText("تصفية حسب الفئة أو الوصف...")
         self._search.textChanged.connect(self._filter)
-        toolbar.addWidget(QLabel("Search:"))
+        toolbar.addWidget(QLabel("بحث:"))
         toolbar.addWidget(self._search)
         toolbar.addStretch()
         toolbar.addWidget(add_btn)
@@ -48,19 +48,19 @@ class ExpensesTab(QWidget):
         self._table = QTableWidget()
         self._table.setColumnCount(5)
         self._table.setHorizontalHeaderLabels(
-            ["Date", "Category", "Description", "Amount", "ID"]
+            ["التاريخ", "الفئة", "الوصف", "المبلغ", "ID"]
         )
         self._table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
-        self._table.setColumnHidden(4, True)  # hide internal ID
+        self._table.setColumnHidden(4, True)
         self._table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self._table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self._table.setAlternatingRowColors(True)
         layout.addWidget(self._table)
 
-        # Summary bar
+        # شريط الملخص
         summary_row = QHBoxLayout()
-        self._total_label = QLabel("Total: $0.00")
-        self._total_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #1a237e;")
+        self._total_label = QLabel("الإجمالي: 0.00")
+        self._total_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #1e3a5f;")
         summary_row.addStretch()
         summary_row.addWidget(self._total_label)
         layout.addLayout(summary_row)
@@ -78,13 +78,13 @@ class ExpensesTab(QWidget):
             self._table.setItem(row, 0, QTableWidgetItem(e.get("date", "")))
             self._table.setItem(row, 1, QTableWidgetItem(e.get("category", "")))
             self._table.setItem(row, 2, QTableWidgetItem(e.get("description", "") or ""))
-            amt_item = QTableWidgetItem(f"${e.get('amount', 0):.2f}")
+            amt_item = QTableWidgetItem(f"{e.get('amount', 0):.2f}")
             amt_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self._table.setItem(row, 3, amt_item)
             self._table.setItem(row, 4, QTableWidgetItem(str(e["id"])))
             self._table.item(row, 0).setData(Qt.ItemDataRole.UserRole, e)
             total += e.get("amount", 0)
-        self._total_label.setText(f"Total: ${total:,.2f}")
+        self._total_label.setText(f"الإجمالي: {total:,.2f}")
 
     def _filter(self, text: str):
         if not text.strip():
@@ -115,7 +115,7 @@ class ExpensesTab(QWidget):
     def _edit_expense(self):
         expense = self._selected_expense()
         if not expense:
-            QMessageBox.information(self, "Select Expense", "Please select an expense to edit.")
+            QMessageBox.information(self, "اختر مصروفاً", "الرجاء اختيار مصروف للتعديل.")
             return
         dlg = _ExpenseDialog(expense=expense, parent=self)
         if dlg.exec() == QDialog.DialogCode.Accepted:
@@ -126,11 +126,11 @@ class ExpensesTab(QWidget):
     def _delete_expense(self):
         expense = self._selected_expense()
         if not expense:
-            QMessageBox.information(self, "Select Expense", "Please select an expense.")
+            QMessageBox.information(self, "اختر مصروفاً", "الرجاء اختيار مصروف.")
             return
         reply = QMessageBox.question(
-            self, "Confirm Delete",
-            f"Delete expense '{expense.get('description','') or expense['category']}' (${expense['amount']:.2f})?",
+            self, "تأكيد الحذف",
+            f"هل تريد حذف المصروف '{expense.get('description','') or expense['category']}' ({expense['amount']:.2f})؟",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if reply == QMessageBox.StandardButton.Yes:
@@ -142,7 +142,7 @@ class _ExpenseDialog(QDialog):
     def __init__(self, expense: dict = None, parent=None):
         super().__init__(parent)
         self._expense = expense
-        self.setWindowTitle("Edit Expense" if expense else "Add Expense")
+        self.setWindowTitle("تعديل مصروف" if expense else "إضافة مصروف")
         self.setMinimumWidth(360)
         self._build_ui()
         if expense:
@@ -163,21 +163,22 @@ class _ExpenseDialog(QDialog):
         self._category.setEditable(True)
 
         self._description = QLineEdit()
-        self._description.setPlaceholderText("Optional description")
+        self._description.setPlaceholderText("وصف اختياري")
 
         self._amount = QDoubleSpinBox()
         self._amount.setRange(0.01, 9999999)
         self._amount.setDecimals(2)
-        self._amount.setPrefix("$")
 
-        layout.addRow("Date *:", self._date)
-        layout.addRow("Category *:", self._category)
-        layout.addRow("Description:", self._description)
-        layout.addRow("Amount *:", self._amount)
+        layout.addRow("التاريخ *:", self._date)
+        layout.addRow("الفئة *:", self._category)
+        layout.addRow("الوصف:", self._description)
+        layout.addRow("المبلغ *:", self._amount)
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         )
+        buttons.button(QDialogButtonBox.StandardButton.Ok).setText("حفظ")
+        buttons.button(QDialogButtonBox.StandardButton.Cancel).setText("إلغاء")
         buttons.accepted.connect(self._validate)
         buttons.rejected.connect(self.reject)
         layout.addRow(buttons)
@@ -201,7 +202,7 @@ class _ExpenseDialog(QDialog):
     def _validate(self):
         if self._amount.value() <= 0:
             from PyQt6.QtWidgets import QMessageBox
-            QMessageBox.warning(self, "Validation", "Amount must be greater than 0.")
+            QMessageBox.warning(self, "تحقق", "يجب أن يكون المبلغ أكبر من صفر.")
             return
         self.accept()
 

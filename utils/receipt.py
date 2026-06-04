@@ -1,4 +1,4 @@
-"""Receipt text generation and print dialog."""
+"""توليد نص الفاتورة وحوار الطباعة."""
 
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QTextEdit,
@@ -8,45 +8,53 @@ from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 from PyQt6.QtPrintSupport import QPrinter, QPrintDialog
 
+PAYMENT_METHOD_AR = {
+    "cash": "نقداً",
+    "card": "بطاقة",
+    "mobile": "محفظة إلكترونية",
+}
+
 
 def generate_receipt_text(sale: dict, items: list, customer: dict | None) -> str:
-    """Return a formatted receipt string."""
+    """إرجاع نص الفاتورة منسقاً باللغة العربية."""
     lines = []
-    w = 42  # receipt width
+    w = 44
 
     lines.append("=" * w)
-    lines.append("BizManager".center(w))
-    lines.append("Sales Receipt".center(w))
+    lines.append("فاتورة - Kavero".center(w))
     lines.append("=" * w)
-    lines.append(f"Date : {sale.get('created_at', '')}")
-    lines.append(f"Sale #: {sale.get('id', '')}")
+    lines.append(f"رقم الفاتورة: #{sale.get('id', '')}")
+    lines.append(f"التاريخ: {sale.get('created_at', '')}")
     if customer:
-        lines.append(f"Customer: {customer.get('name', 'Walk-in')}")
-    lines.append(f"Payment: {sale.get('payment_method', 'cash').upper()}")
+        lines.append(f"العميل: {customer.get('name', 'بدون عميل')}")
+    else:
+        lines.append("العميل: بدون عميل")
+    pm = sale.get("payment_method", "cash").lower()
+    lines.append(f"طريقة الدفع: {PAYMENT_METHOD_AR.get(pm, pm)}")
     lines.append("-" * w)
-    lines.append(f"{'Item':<20} {'Qty':>4} {'Price':>7} {'Total':>8}")
+    lines.append(f"{'المنتج':<18} {'الكمية':>6} {'السعر':>8} {'الإجمالي':>9}")
     lines.append("-" * w)
 
     subtotal = 0.0
     for item in items:
-        name = str(item.get("product_name", ""))[:20]
+        name = str(item.get("product_name", ""))[:18]
         qty = item.get("quantity", 0)
         price = item.get("unit_price", 0.0)
         total = qty * price
         subtotal += total
-        lines.append(f"{name:<20} {qty:>4} {price:>7.2f} {total:>8.2f}")
+        lines.append(f"{name:<18} {qty:>6.2f} {price:>8.2f} {total:>9.2f}")
 
     lines.append("-" * w)
     discount = sale.get("discount", 0.0)
     discount_amt = subtotal * discount / 100.0
     net_total = sale.get("total_amount", subtotal - discount_amt)
 
-    lines.append(f"{'Subtotal':>32} {subtotal:>8.2f}")
+    lines.append(f"الإجمالي قبل الخصم: {subtotal:>10.2f}")
     if discount:
-        lines.append(f"{'Discount (' + str(discount) + '%)':>32} {-discount_amt:>8.2f}")
-    lines.append(f"{'TOTAL':>32} {net_total:>8.2f}")
+        lines.append(f"الخصم ({discount}%): {-discount_amt:>14.2f}")
+    lines.append(f"الإجمالي: {net_total:>20.2f}")
     lines.append("=" * w)
-    lines.append("Thank you for your purchase!".center(w))
+    lines.append("شكراً لتعاملكم معنا".center(w))
     lines.append("=" * w)
 
     return "\n".join(lines)
@@ -55,7 +63,7 @@ def generate_receipt_text(sale: dict, items: list, customer: dict | None) -> str
 class ReceiptDialog(QDialog):
     def __init__(self, sale: dict, items: list, customer: dict | None, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Receipt")
+        self.setWindowTitle("الفاتورة")
         self.setMinimumSize(480, 560)
         self._sale = sale
         self._items = items
@@ -68,7 +76,7 @@ class ReceiptDialog(QDialog):
         layout.setContentsMargins(16, 16, 16, 16)
         layout.setSpacing(12)
 
-        title = QLabel("Receipt")
+        title = QLabel("الفاتورة")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title.setStyleSheet("font-size: 16px; font-weight: bold;")
         layout.addWidget(title)
@@ -76,12 +84,13 @@ class ReceiptDialog(QDialog):
         self._editor = QTextEdit()
         self._editor.setReadOnly(True)
         self._editor.setFont(QFont("Courier New", 10))
+        self._editor.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self._editor.setPlainText(self._receipt_text)
         layout.addWidget(self._editor)
 
         btn_row = QHBoxLayout()
-        btn_print = QPushButton("Print")
-        btn_close = QPushButton("Close")
+        btn_print = QPushButton("طباعة")
+        btn_close = QPushButton("إغلاق")
         btn_print.setObjectName("primaryBtn")
         btn_row.addWidget(btn_print)
         btn_row.addWidget(btn_close)

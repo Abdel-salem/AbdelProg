@@ -453,3 +453,64 @@ def get_expenses_for_period(date_from, date_to):
             "SELECT * FROM expenses WHERE date BETWEEN ? AND ? ORDER BY date",
             (date_from, date_to)
         ).fetchall()]
+
+
+def get_monthly_revenue(months: int = 12):
+    """Returns list of dicts: month (YYYY-MM), revenue for line chart."""
+    with get_connection() as conn:
+        rows = conn.execute(
+            """SELECT strftime('%Y-%m', created_at) as month,
+                      SUM(total_amount) as revenue
+               FROM sales
+               GROUP BY month
+               ORDER BY month DESC
+               LIMIT ?""",
+            (months,)
+        ).fetchall()
+        return list(reversed([dict(r) for r in rows]))
+
+
+# ─────────────────────────────────────────────────────────────
+# RECEIPTS HISTORY
+# ─────────────────────────────────────────────────────────────
+
+def get_all_sales_with_details():
+    """Returns list of dicts: id, created_at, customer_name, total_amount, discount, payment_method."""
+    with get_connection() as conn:
+        rows = conn.execute(
+            """SELECT s.id, s.created_at, s.total_amount, s.discount, s.payment_method,
+                      COALESCE(c.name, 'بدون عميل') as customer_name
+               FROM sales s
+               LEFT JOIN customers c ON c.id = s.customer_id
+               ORDER BY s.created_at DESC"""
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_sale_items(sale_id):
+    """Returns list: product_name, quantity, unit_price, cost_price, line_total."""
+    with get_connection() as conn:
+        rows = conn.execute(
+            """SELECT p.name as product_name, si.quantity, si.unit_price, si.cost_price,
+                      (si.quantity * si.unit_price) as line_total
+               FROM sale_items si
+               JOIN products p ON p.id = si.product_id
+               WHERE si.sale_id = ?""",
+            (sale_id,)
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_recent_sales(limit: int = 5):
+    """Returns last N sales with customer name for POS recent sales panel."""
+    with get_connection() as conn:
+        rows = conn.execute(
+            """SELECT s.id, s.created_at, s.total_amount, s.payment_method,
+                      COALESCE(c.name, 'بدون عميل') as customer_name
+               FROM sales s
+               LEFT JOIN customers c ON c.id = s.customer_id
+               ORDER BY s.created_at DESC
+               LIMIT ?""",
+            (limit,)
+        ).fetchall()
+        return [dict(r) for r in rows]

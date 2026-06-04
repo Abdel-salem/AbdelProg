@@ -1,4 +1,4 @@
-"""Customers tab — manage customers and view purchase history."""
+"""تبويب العملاء — إدارة العملاء وعرض سجل المشتريات."""
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
@@ -10,6 +10,12 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor
 
 import database.db as db
+
+PAYMENT_METHOD_AR = {
+    "cash": "نقداً",
+    "card": "بطاقة",
+    "mobile": "محفظة إلكترونية",
+}
 
 
 class CustomersTab(QWidget):
@@ -24,25 +30,25 @@ class CustomersTab(QWidget):
 
         splitter = QSplitter(Qt.Orientation.Vertical)
 
-        # Top: customers table
+        # الجزء العلوي: جدول العملاء
         top_widget = QWidget()
         top_layout = QVBoxLayout(top_widget)
         top_layout.setContentsMargins(0, 0, 0, 0)
 
         toolbar = QHBoxLayout()
         self._search = QLineEdit()
-        self._search.setPlaceholderText("Search by name, phone or email...")
+        self._search.setPlaceholderText("بحث بالاسم أو الهاتف أو البريد الإلكتروني...")
         self._search.textChanged.connect(self._filter)
-        toolbar.addWidget(QLabel("Search:"))
+        toolbar.addWidget(QLabel("بحث:"))
         toolbar.addWidget(self._search)
         toolbar.addStretch()
 
-        add_btn = QPushButton("Add Customer")
+        add_btn = QPushButton("إضافة عميل")
         add_btn.setObjectName("successBtn")
         add_btn.clicked.connect(self._add_customer)
-        edit_btn = QPushButton("Edit")
+        edit_btn = QPushButton("تعديل")
         edit_btn.clicked.connect(self._edit_customer)
-        del_btn = QPushButton("Delete")
+        del_btn = QPushButton("حذف")
         del_btn.setObjectName("dangerBtn")
         del_btn.clicked.connect(self._delete_customer)
         toolbar.addWidget(add_btn)
@@ -53,7 +59,7 @@ class CustomersTab(QWidget):
         self._table = QTableWidget()
         self._table.setColumnCount(5)
         self._table.setHorizontalHeaderLabels(
-            ["Name", "Phone", "Email", "Loyalty Points", "Joined"]
+            ["الاسم", "الهاتف", "البريد الإلكتروني", "نقاط الولاء", "تاريخ الانضمام"]
         )
         self._table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         self._table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
@@ -64,14 +70,14 @@ class CustomersTab(QWidget):
 
         splitter.addWidget(top_widget)
 
-        # Bottom: purchase history
-        bottom_widget = QGroupBox("Purchase History")
+        # الجزء السفلي: سجل المشتريات
+        bottom_widget = QGroupBox("سجل المشتريات")
         bottom_layout = QVBoxLayout(bottom_widget)
 
         self._history_table = QTableWidget()
         self._history_table.setColumnCount(5)
         self._history_table.setHorizontalHeaderLabels(
-            ["Sale #", "Total", "Discount %", "Payment", "Date"]
+            ["رقم الفاتورة", "الإجمالي", "الخصم %", "طريقة الدفع", "التاريخ"]
         )
         self._history_table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
         self._history_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
@@ -130,9 +136,12 @@ class CustomersTab(QWidget):
             row = self._history_table.rowCount()
             self._history_table.insertRow(row)
             self._history_table.setItem(row, 0, QTableWidgetItem(str(s["id"])))
-            self._history_table.setItem(row, 1, QTableWidgetItem(f"${s['total_amount']:.2f}"))
+            amt_item = QTableWidgetItem(f"{s['total_amount']:.2f}")
+            amt_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            self._history_table.setItem(row, 1, amt_item)
             self._history_table.setItem(row, 2, QTableWidgetItem(f"{s.get('discount',0):.1f}%"))
-            self._history_table.setItem(row, 3, QTableWidgetItem(s.get("payment_method", "")))
+            pm = s.get("payment_method", "").lower()
+            self._history_table.setItem(row, 3, QTableWidgetItem(PAYMENT_METHOD_AR.get(pm, pm)))
             self._history_table.setItem(row, 4, QTableWidgetItem(s.get("created_at", "")))
 
     def _add_customer(self):
@@ -145,7 +154,7 @@ class CustomersTab(QWidget):
     def _edit_customer(self):
         customer = self._selected_customer()
         if not customer:
-            QMessageBox.information(self, "Select Customer", "Please select a customer to edit.")
+            QMessageBox.information(self, "اختر عميلاً", "الرجاء اختيار عميل للتعديل.")
             return
         dlg = _CustomerDialog(customer=customer, parent=self)
         if dlg.exec() == QDialog.DialogCode.Accepted:
@@ -156,11 +165,11 @@ class CustomersTab(QWidget):
     def _delete_customer(self):
         customer = self._selected_customer()
         if not customer:
-            QMessageBox.information(self, "Select Customer", "Please select a customer.")
+            QMessageBox.information(self, "اختر عميلاً", "الرجاء اختيار عميل.")
             return
         reply = QMessageBox.question(
-            self, "Confirm Delete",
-            f"Delete customer '{customer['name']}'?",
+            self, "تأكيد الحذف",
+            f"هل تريد حذف العميل '{customer['name']}'؟",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if reply == QMessageBox.StandardButton.Yes:
@@ -172,7 +181,7 @@ class _CustomerDialog(QDialog):
     def __init__(self, customer: dict = None, parent=None):
         super().__init__(parent)
         self._customer = customer
-        self.setWindowTitle("Edit Customer" if customer else "Add Customer")
+        self.setWindowTitle("تعديل عميل" if customer else "إضافة عميل")
         self.setMinimumWidth(350)
         self._build_ui()
         if customer:
@@ -187,13 +196,15 @@ class _CustomerDialog(QDialog):
         self._phone = QLineEdit()
         self._email = QLineEdit()
 
-        layout.addRow("Name *:", self._name)
-        layout.addRow("Phone:", self._phone)
-        layout.addRow("Email:", self._email)
+        layout.addRow("الاسم *:", self._name)
+        layout.addRow("الهاتف:", self._phone)
+        layout.addRow("البريد الإلكتروني:", self._email)
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         )
+        buttons.button(QDialogButtonBox.StandardButton.Ok).setText("حفظ")
+        buttons.button(QDialogButtonBox.StandardButton.Cancel).setText("إلغاء")
         buttons.accepted.connect(self._validate)
         buttons.rejected.connect(self.reject)
         layout.addRow(buttons)
@@ -205,7 +216,7 @@ class _CustomerDialog(QDialog):
 
     def _validate(self):
         if not self._name.text().strip():
-            QMessageBox.warning(self, "Validation", "Customer name is required.")
+            QMessageBox.warning(self, "تحقق", "اسم العميل مطلوب.")
             return
         self.accept()
 
