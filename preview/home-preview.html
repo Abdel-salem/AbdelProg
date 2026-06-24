@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flexera - Home Preview</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f4f6fb;
+    color: #1f2430;
+  }
+  .app {
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #f4f6fb;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 16px 10px;
+    background: #f4f6fb;
+  }
+  .icon-btn {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1f2430;
+  }
+  .badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #eb445a;
+    color: white;
+    font-size: 0.65rem;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+  .brand {
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+  }
+  .brand .accent { color: #3a7bfd; }
+
+  /* Greeting */
+  .greeting { padding: 4px 16px 0; }
+  .greeting h1 { margin: 0; font-size: 1.25rem; font-weight: 700; }
+  .greeting p { margin: 4px 0 0; color: #6b7280; font-size: 0.88rem; }
+
+  /* Summary grid */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px 16px 0;
+  }
+  .summary-card {
+    background: white;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .summary-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    font-size: 1rem;
+  }
+  .icon-purple { color: #6c63ff; background: rgba(108,99,255,0.12); }
+  .icon-green { color: #2dd36f; background: rgba(45,211,111,0.12); }
+  .icon-blue { color: #3a7bfd; background: rgba(58,123,253,0.12); }
+  .icon-red { color: #eb445a; background: rgba(235,68,90,0.12); }
+  .summary-label { margin: 0; font-size: 0.78rem; color: #6b7280; }
+  .summary-value { margin: 2px 0; font-size: 1.15rem; font-weight: 700; }
+  .summary-sub { margin: 0; font-size: 0.72rem; color: #6b7280; }
+  .summary-date { margin: 0; font-size: 0.72rem; color: #2dd36f; font-weight: 600; }
+
+  /* Reminder */
+  .reminder {
+    margin: 14px 16px;
+    padding: 14px;
+    border-radius: 12px;
+    background: #eaf1ff;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .reminder-icon { font-size: 1.3rem; color: #3a7bfd; flex-shrink: 0; }
+  .reminder-text { flex: 1; }
+  .reminder-title { margin: 0; font-weight: 600; font-size: 0.88rem; }
+  .reminder-body { margin: 2px 0 0; font-size: 0.78rem; color: #6b7280; }
+  .reminder-btn {
+    flex-shrink: 0;
+    background: #3a7bfd;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Section header */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 16px 0;
+  }
+  .section-header h3 { margin: 0; font-weight: 700; font-size: 1.05rem; }
+  .view-all {
+    color: #3a7bfd;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  /* Order card */
+  .order-card {
+    margin: 12px 16px;
+    background: white;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .order-top {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .order-id-block { display: flex; gap: 8px; flex: 1 1 110px; }
+  .order-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #eaf1ff;
+    color: #3a7bfd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1rem;
+  }
+  .order-label { margin: 0; font-size: 0.72rem; color: #6b7280; }
+  .order-id { margin: 0; font-weight: 700; font-size: 0.9rem; }
+  .status-chip {
+    display: inline-block;
+    margin: 4px 0;
+    background: rgba(45,211,111,0.15);
+    color: #1aa15c;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .order-plan { margin: 0; font-size: 0.72rem; color: #6b7280; }
+
+  .order-amounts { flex: 1 1 120px; }
+  .amount-label { margin: 0; font-size: 0.7rem; color: #6b7280; }
+  .amount-value { margin: 0 0 6px; font-weight: 700; font-size: 0.82rem; }
+  .amount-value.paid { color: #2dd36f; }
+  .amount-value.remaining { color: #3a7bfd; }
+
+  .order-progress { flex: 1 1 150px; cursor: pointer; }
+  .progress-label {
+    margin: 0 0 4px;
+    font-size: 0.72rem;
+    color: #6b7280;
+    display: flex;
+    justify-content: space-between;
+  }
+  .progress-bar-bg {
+    height: 6px;
+    border-radius: 4px;
+    background: #e3e7f0;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .progress-bar-fill { height: 100%; background: #3a7bfd; border-radius: 4px; }
+  .next-due-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .next-due-value { margin: 0; font-weight: 700; color: #3a7bfd; font-size: 0.88rem; }
+  .next-due-date { margin: 0; font-weight: 600; font-size: 0.82rem; }
+  .chev { color: #9aa3b2; }
+
+  .order-actions {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #eef0f4;
+    margin-top: 10px;
+    padding-top: 8px;
+  }
+  .order-actions button {
+    background: none;
+    border: none;
+    color: #1f2430;
+    font-size: 0.74rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  /* Marketplace card */
+  .marketplace-card {
+    margin: 12px 16px 90px;
+    background: white;
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .marketplace-icon { font-size: 1.5rem; color: #9aa3b2; flex-shrink: 0; }
+  .marketplace-text { flex: 1; }
+  .marketplace-title { margin: 0; font-weight: 600; font-size: 0.86rem; }
+  .marketplace-sub { margin: 2px 0 0; font-size: 0.72rem; color: #6b7280; }
+  .marketplace-btn {
+    background: white;
+    border: 1px solid #3a7bfd;
+    color: #3a7bfd;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* Tab bar */
+  .tab-bar {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    display: flex;
+    justify-content: space-around;
+    background: white;
+    border-top: 1px solid #eef0f4;
+    padding: 10px 0 14px;
+  }
+  .tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.68rem;
+    color: #9aa3b2;
+  }
+  .tab-item.active { color: #3a7bfd; }
+  .tab-icon { font-size: 1.2rem; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="icon-btn">🔔<span class="badge">3</span></div>
+    <div class="brand">FLEX<span class="accent">ERA</span></div>
+    <div class="icon-btn">👤</div>
+  </div>
+
+  <div class="greeting">
+    <h1>Welcome back, John Doe 👋</h1>
+    <p>Here's an overview of your installment plans.</p>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-icon icon-purple">💼</div>
+      <p class="summary-label">Total Outstanding</p>
+      <h2 class="summary-value">17,500 EGP</h2>
+      <p class="summary-sub">From 2 Orders</p>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon icon-green">📅</div>
+      <p class="summary-label">Next Payment</p>
+      <h2 class="summary-value">1,750 EGP</h2>
+      <p class="summary-sub">Due in 5 Days</p>
+      <p class="summary-date">12 Jun 2025</p>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon icon-blue">🛍️</div>
+      <p class="summary-label">Active Orders</p>
+      <h2 class="summary-value">2</h2>
+      <p class="summary-sub">In Progress</p>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon icon-red">⚠️</div>
+      <p class="summary-label">Overdue</p>
+      <h2 class="summary-value">0</h2>
+      <p class="summary-sub">No Overdue</p>
+    </div>
+  </div>
+
+  <div class="reminder">
+    <div class="reminder-icon">ⓘ</div>
+    <div class="reminder-text">
+      <p class="reminder-title">You have a payment due soon</p>
+      <p class="reminder-body">Installment 4 of Order ORD-2025-001234 is due on 12 Jun 2025.</p>
+    </div>
+    <button class="reminder-btn">Pay Now</button>
+  </div>
+
+  <div class="section-header">
+    <h3>My Orders</h3>
+    <a class="view-all" href="#">View All ›</a>
+  </div>
+
+  <div class="order-card">
+    <div class="order-top">
+      <div class="order-id-block">
+        <div class="order-icon">📦</div>
+        <div>
+          <p class="order-label">Order</p>
+          <p class="order-id">ORD-2025-001234</p>
+          <span class="status-chip">Active</span>
+          <p class="order-plan">6 Installments Plan</p>
+        </div>
+      </div>
+
+      <div class="order-amounts">
+        <p class="amount-label">Total Order Amount</p>
+        <p class="amount-value">10,500 EGP</p>
+        <p class="amount-label">Paid Amount</p>
+        <p class="amount-value paid">5,250 EGP</p>
+        <p class="amount-label">Remaining Amount</p>
+        <p class="amount-value remaining">5,250 EGP</p>
+      </div>
+
+      <div class="order-progress">
+        <p class="progress-label">Installments Paid <span>3 / 6</span></p>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:50%"></div></div>
+        <div class="next-due-row">
+          <div>
+            <p class="progress-label">Next Due</p>
+            <p class="next-due-value">1,750 EGP</p>
+          </div>
+          <span class="chev">›</span>
+        </div>
+        <div class="next-due-row">
+          <p class="progress-label">Due Date</p>
+          <p class="next-due-date">12 Jun 2025</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="order-actions">
+      <button>📄 View Details</button>
+      <button>⬆️ Upload Receipt</button>
+      <button>📁 Documents</button>
+    </div>
+  </div>
+
+  <div class="order-card">
+    <div class="order-top">
+      <div class="order-id-block">
+        <div class="order-icon">📦</div>
+        <div>
+          <p class="order-label">Order</p>
+          <p class="order-id">ORD-2025-001235</p>
+          <span class="status-chip">Active</span>
+          <p class="order-plan">12 Installments Plan</p>
+        </div>
+      </div>
+
+      <div class="order-amounts">
+        <p class="amount-label">Total Order Amount</p>
+        <p class="amount-value">12,000 EGP</p>
+        <p class="amount-label">Paid Amount</p>
+        <p class="amount-value paid">2,250 EGP</p>
+        <p class="amount-label">Remaining Amount</p>
+        <p class="amount-value remaining">9,750 EGP</p>
+      </div>
+
+      <div class="order-progress">
+        <p class="progress-label">Installments Paid <span>1 / 12</span></p>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:8.3%"></div></div>
+        <div class="next-due-row">
+          <div>
+            <p class="progress-label">Next Due</p>
+            <p class="next-due-value">750 EGP</p>
+          </div>
+          <span class="chev">›</span>
+        </div>
+        <div class="next-due-row">
+          <p class="progress-label">Due Date</p>
+          <p class="next-due-date">28 Jun 2025</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="order-actions">
+      <button>📄 View Details</button>
+      <button>⬆️ Upload Receipt</button>
+      <button>📁 Documents</button>
+    </div>
+  </div>
+
+  <div class="marketplace-card">
+    <div class="marketplace-icon">📄</div>
+    <div class="marketplace-text">
+      <p class="marketplace-title">Looking to add a new order?</p>
+      <p class="marketplace-sub">Explore our marketplace and apply for a new installment plan.</p>
+    </div>
+    <button class="marketplace-btn">Explore Marketplace</button>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab-item active"><span class="tab-icon">🏠</span>Home</div>
+    <div class="tab-item"><span class="tab-icon">🛍️</span>Marketplace</div>
+    <div class="tab-item"><span class="tab-icon">📄</span>Orders</div>
+    <div class="tab-item"><span class="tab-icon">👤</span>Profile</div>
+    <div class="tab-item"><span class="tab-icon">ⓘ</span>Info</div>
+  </div>
+
+</div>
+</body>
+</html>
