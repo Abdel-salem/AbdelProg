@@ -1,0 +1,182 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button>
+        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+        <ion-badge *ngIf="notificationCount > 0" color="danger" class="notification-badge">
+          {{ notificationCount }}
+        </ion-badge>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title class="brand-title">
+      FLEX<span class="brand-accent">ERA</span>
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="person-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="home-content">
+  <div class="greeting">
+    <h1>Welcome back, {{ userName }} 👋</h1>
+    <p>Here's an overview of your installment plans.</p>
+  </div>
+
+  <ion-grid class="summary-grid">
+    <ion-row>
+      <ion-col size="6">
+        <ion-card class="summary-card">
+          <ion-icon name="wallet-outline" class="summary-icon icon-purple"></ion-icon>
+          <p class="summary-label">Total Outstanding</p>
+          <h2 class="summary-value">{{ summary.totalOutstanding | number }} EGP</h2>
+          <p class="summary-sub">From {{ summary.totalOutstandingOrders }} Orders</p>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="6">
+        <ion-card class="summary-card">
+          <ion-icon name="calendar-outline" class="summary-icon icon-green"></ion-icon>
+          <p class="summary-label">Next Payment</p>
+          <h2 class="summary-value">{{ summary.nextPaymentAmount | number }} EGP</h2>
+          <p class="summary-sub">Due in {{ summary.nextPaymentDueInDays }} Days</p>
+          <p class="summary-date">{{ summary.nextPaymentDate }}</p>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="6">
+        <ion-card class="summary-card">
+          <ion-icon name="bag-handle-outline" class="summary-icon icon-blue"></ion-icon>
+          <p class="summary-label">Active Orders</p>
+          <h2 class="summary-value">{{ summary.activeOrders }}</h2>
+          <p class="summary-sub">In Progress</p>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="6">
+        <ion-card class="summary-card">
+          <ion-icon name="alert-circle-outline" class="summary-icon icon-red"></ion-icon>
+          <p class="summary-label">Overdue</p>
+          <h2 class="summary-value">{{ summary.overdueCount }}</h2>
+          <p class="summary-sub">No Overdue</p>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-card *ngIf="showReminder" class="reminder-banner">
+    <ion-icon name="information-circle-outline" class="reminder-icon"></ion-icon>
+    <div class="reminder-text">
+      <p class="reminder-title">You have a payment due soon</p>
+      <p class="reminder-body">
+        Installment {{ reminder.installmentNumber }} of Order {{ reminder.orderId }}
+        is due on {{ reminder.dueDate }}.
+      </p>
+    </div>
+    <ion-button size="small" fill="solid" color="primary" class="reminder-action">
+      Pay Now
+    </ion-button>
+  </ion-card>
+
+  <div class="section-header">
+    <h3>My Orders</h3>
+    <ion-button fill="clear" size="small" (click)="viewAllOrders()">
+      View All
+      <ion-icon slot="end" name="chevron-forward-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <ion-card class="order-card" *ngFor="let order of orders">
+    <div class="order-top">
+      <div class="order-id-block">
+        <ion-icon name="cube-outline" class="order-icon"></ion-icon>
+        <div>
+          <p class="order-label">Order</p>
+          <p class="order-id">{{ order.id }}</p>
+          <ion-chip color="success" class="status-chip">{{ order.status }}</ion-chip>
+          <p class="order-plan">{{ order.installmentsPlanLabel }}</p>
+        </div>
+      </div>
+
+      <div class="order-amounts">
+        <p class="amount-label">Total Order Amount</p>
+        <p class="amount-value">{{ order.totalAmount | number }} EGP</p>
+        <p class="amount-label">Paid Amount</p>
+        <p class="amount-value paid">{{ order.paidAmount | number }} EGP</p>
+        <p class="amount-label">Remaining Amount</p>
+        <p class="amount-value remaining">{{ order.remainingAmount | number }} EGP</p>
+      </div>
+
+      <div class="order-progress" (click)="viewOrderDetails(order)">
+        <p class="progress-label">
+          Installments Paid
+          <span>{{ order.installments.paid }} / {{ order.installments.total }}</span>
+        </p>
+        <ion-progress-bar [value]="installmentProgress(order)"></ion-progress-bar>
+
+        <div class="next-due-row">
+          <div>
+            <p class="progress-label">Next Due</p>
+            <p class="next-due-value">{{ order.nextDueAmount | number }} EGP</p>
+          </div>
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </div>
+        <div class="next-due-row">
+          <p class="progress-label">Due Date</p>
+          <p class="next-due-date">{{ order.nextDueDate }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="order-actions">
+      <ion-button fill="clear" size="small" (click)="viewOrderDetails(order)">
+        <ion-icon slot="start" name="reader-outline"></ion-icon>
+        View Details
+      </ion-button>
+      <ion-button fill="clear" size="small" (click)="uploadReceipt(order)">
+        <ion-icon slot="start" name="cloud-upload-outline"></ion-icon>
+        Upload Receipt
+      </ion-button>
+      <ion-button fill="clear" size="small" (click)="viewDocuments(order)">
+        <ion-icon slot="start" name="folder-outline"></ion-icon>
+        Documents
+      </ion-button>
+    </div>
+  </ion-card>
+
+  <ion-card class="marketplace-card" button (click)="exploreMarketplace()">
+    <ion-icon name="document-text-outline" class="marketplace-icon"></ion-icon>
+    <div class="marketplace-text">
+      <p class="marketplace-title">Looking to add a new order?</p>
+      <p class="marketplace-sub">Explore our marketplace and apply for a new installment plan.</p>
+    </div>
+    <ion-button size="small" fill="outline">Explore Marketplace</ion-button>
+  </ion-card>
+</ion-content>
+
+<ion-tab-bar slot="bottom">
+  <ion-tab-button tab="home" selected>
+    <ion-icon name="home-outline"></ion-icon>
+    <ion-label>Home</ion-label>
+  </ion-tab-button>
+  <ion-tab-button tab="marketplace">
+    <ion-icon name="bag-outline"></ion-icon>
+    <ion-label>Marketplace</ion-label>
+  </ion-tab-button>
+  <ion-tab-button tab="orders">
+    <ion-icon name="document-text-outline"></ion-icon>
+    <ion-label>Orders</ion-label>
+  </ion-tab-button>
+  <ion-tab-button tab="profile">
+    <ion-icon name="person-outline"></ion-icon>
+    <ion-label>Profile</ion-label>
+  </ion-tab-button>
+  <ion-tab-button tab="info">
+    <ion-icon name="information-circle-outline"></ion-icon>
+    <ion-label>Info</ion-label>
+  </ion-tab-button>
+</ion-tab-bar>
