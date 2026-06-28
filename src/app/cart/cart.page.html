@@ -1,0 +1,57 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button>
+        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+        <ion-badge *ngIf="items.length > 0" color="danger" class="notification-badge">
+          {{ items.length }}
+        </ion-badge>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title class="brand-title">
+      FLEX<span class="brand-accent">ERA</span>
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+        <ion-badge *ngIf="notificationCount > 0" color="danger" class="notification-badge">
+          {{ notificationCount }}
+        </ion-badge>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cart-content">
+  <ion-card class="item-card" *ngFor="let item of items">
+    <div class="item-row">
+      <img [src]="item.image" class="item-image" alt="{{ item.name }}" />
+
+      <div class="item-info">
+        <p class="item-name">{{ item.name }}</p>
+        <p class="item-category">{{ item.category }}</p>
+        <p class="item-detail">Price: {{ item.price | number }}</p>
+        <p class="item-detail">Quantity: {{ item.quantity }}</p>
+      </div>
+
+      <div class="item-actions">
+        <ion-button fill="clear" size="small" (click)="editItem(item)">
+          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" size="small" color="danger" (click)="removeItem(item)">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </ion-card>
+
+  <ion-card class="summary-card">
+    <h3 class="summary-title">Cart Summary</h3>
+    <p class="summary-total">Total: {{ total | number }} EGP</p>
+    <ion-button expand="block" class="checkout-btn" (click)="checkout()">
+      Checkout
+    </ion-button>
+  </ion-card>
+</ion-content>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flexera - Cart Preview</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f4f6fb;
+    color: #1f2430;
+  }
+  .app {
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #f4f6fb;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 16px 10px;
+  }
+  .icon-btn {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1f2430;
+    font-size: 1.1rem;
+  }
+  .badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #eb445a;
+    color: white;
+    font-size: 0.65rem;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+  .brand {
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+  }
+  .brand .accent { color: #3a7bfd; }
+
+  .item-card {
+    margin: 12px 16px;
+    background: white;
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .item-image {
+    width: 72px;
+    height: 72px;
+    border-radius: 10px;
+    background: #1f2430;
+    flex-shrink: 0;
+  }
+  .item-info { flex: 1; }
+  .item-name { margin: 0; font-weight: 700; font-size: 0.95rem; }
+  .item-category { margin: 2px 0 6px; font-size: 0.8rem; color: #6b7280; }
+  .item-detail { margin: 0; font-size: 0.78rem; color: #6b7280; }
+  .item-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .icon-action {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #6b7280;
+  }
+  .icon-action.danger { color: #eb445a; }
+
+  .summary-card {
+    margin: 20px 16px;
+    background: white;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .summary-title { margin: 0 0 12px; font-weight: 700; font-size: 1.05rem; }
+  .summary-total { margin: 0 0 16px; font-weight: 700; font-size: 0.95rem; color: #3a7bfd; }
+  .checkout-btn {
+    width: 100%;
+    background: #1f3a5f;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="icon-btn">🛒<span class="badge">2</span></div>
+    <div class="brand">FLEX<span class="accent">ERA</span></div>
+    <div class="icon-btn">🔔</div>
+  </div>
+
+  <div class="item-card">
+    <div class="item-image"></div>
+    <div class="item-info">
+      <p class="item-name">EXtreme</p>
+      <p class="item-category">Endomotor</p>
+      <p class="item-detail">Price: 10,000</p>
+      <p class="item-detail">Quantity: 1</p>
+    </div>
+    <div class="item-actions">
+      <div class="icon-action">✏️</div>
+      <div class="icon-action danger">🗑️</div>
+    </div>
+  </div>
+
+  <div class="item-card">
+    <div class="item-image"></div>
+    <div class="item-info">
+      <p class="item-name">Fast Pack Pro</p>
+      <p class="item-category">Obturation System</p>
+      <p class="item-detail">Price: 14,000</p>
+      <p class="item-detail">Quantity: 1</p>
+    </div>
+    <div class="item-actions">
+      <div class="icon-action">✏️</div>
+      <div class="icon-action danger">🗑️</div>
+    </div>
+  </div>
+
+  <div class="summary-card">
+    <h3 class="summary-title">Cart Summary</h3>
+    <p class="summary-total">Total: 24,000 EGP</p>
+    <button class="checkout-btn">CHECKOUT</button>
+  </div>
+
+</div>
+</body>
+</html>
