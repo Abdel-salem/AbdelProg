@@ -17,6 +17,13 @@ import {
   homeOutline,
   bagOutline,
   personOutline,
+  cartOutline,
+  createOutline,
+  trashOutline,
+  businessOutline,
+  bicycleOutline,
+  locationOutline,
+  checkmarkDoneOutline,
 } from 'ionicons/icons';
 
 addIcons({
@@ -36,6 +43,13 @@ addIcons({
   'home-outline': homeOutline,
   'bag-outline': bagOutline,
   'person-outline': personOutline,
+  'cart-outline': cartOutline,
+  'create-outline': createOutline,
+  'trash-outline': trashOutline,
+  'business-outline': businessOutline,
+  'bicycle-outline': bicycleOutline,
+  'location-outline': locationOutline,
+  'checkmark-done-outline': checkmarkDoneOutline,
 });
 
 @Component({

@@ -1,0 +1,82 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/cart"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="page-title">Order summary</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="order-content">
+  <ion-card class="section-card">
+    <h3 class="section-title">Order Details:</h3>
+
+    <div class="order-line" *ngFor="let line of lines">
+      <span class="line-name">{{ line.name }}</span>
+      <span class="line-qty">x {{ line.quantity }}</span>
+      <span class="line-price">{{ line.price | number }} EGP</span>
+    </div>
+
+    <div class="total-row">
+      <span>Total Price:</span>
+      <span class="total-value">{{ totalPrice | number }} EGP</span>
+    </div>
+  </ion-card>
+
+  <ion-card class="section-card">
+    <h3 class="section-title">Receive Order Via:</h3>
+
+    <div class="fulfillment-options">
+      <button
+        class="fulfillment-btn"
+        [class.active]="fulfillmentMethod === 'pickup'"
+        (click)="selectFulfillment('pickup')"
+      >
+        <ion-icon name="business-outline"></ion-icon>
+        Receive from Company
+      </button>
+      <button
+        class="fulfillment-btn"
+        [class.active]="fulfillmentMethod === 'delivery'"
+        (click)="selectFulfillment('delivery')"
+      >
+        <ion-icon name="bicycle-outline"></ion-icon>
+        Delivery
+      </button>
+    </div>
+  </ion-card>
+
+  <ion-card class="section-card" *ngIf="fulfillmentMethod === 'delivery'">
+    <h3 class="section-title">Your Delivery Address:</h3>
+
+    <ion-item lines="full" class="form-item">
+      <ion-select label="" placeholder="City" interface="action-sheet" [(ngModel)]="city">
+        <ion-select-option value="cairo">Cairo</ion-select-option>
+        <ion-select-option value="giza">Giza</ion-select-option>
+        <ion-select-option value="alexandria">Alexandria</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item lines="full" class="form-item">
+      <ion-input placeholder="Apartment / Building / Street" [(ngModel)]="addressLine"></ion-input>
+    </ion-item>
+
+    <ion-item lines="full" class="form-item" button (click)="selectLocationOnMap()">
+      <ion-label color="medium">Select Location on Google Map</ion-label>
+      <ion-icon slot="end" name="location-outline" color="medium"></ion-icon>
+    </ion-item>
+  </ion-card>
+
+  <ion-card class="section-card">
+    <ion-item lines="full" class="form-item promo-item">
+      <ion-input placeholder="Enter PromoCode" [(ngModel)]="promoCode"></ion-input>
+      <ion-button slot="end" fill="clear" class="promo-apply" (click)="applyPromoCode()">
+        <ion-icon name="checkmark-done-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-card>
+
+  <ion-button expand="block" class="submit-btn" (click)="submit()">
+    Submit
+  </ion-button>
+</ion-content>

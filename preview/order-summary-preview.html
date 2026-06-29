@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flexera - Order Summary Preview</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f4f6fb;
+    color: #1f2430;
+  }
+  .app {
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #f4f6fb;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 16px;
+  }
+  .back-btn {
+    position: absolute;
+    left: 12px;
+    font-size: 1.3rem;
+    color: #1f2430;
+  }
+  .page-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
+  .card {
+    margin: 12px 16px;
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .section-title {
+    margin: 0 0 14px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1f3a5f;
+  }
+
+  .order-line {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+  }
+  .line-name { flex: 1; font-weight: 600; color: #1f3a5f; }
+  .line-qty { flex: 0 0 50px; color: #6b7280; }
+  .line-price { flex: 0 0 90px; text-align: right; font-weight: 600; color: #1f3a5f; }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #eef0f4;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #1f3a5f;
+  }
+  .total-value { color: #3a7bfd; }
+
+  .fulfillment-options {
+    display: flex;
+    gap: 10px;
+  }
+  .fulfillment-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 8px;
+    border-radius: 12px;
+    border: 1.5px solid #e3e7f0;
+    background: #f9fafc;
+    color: #6b7280;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .fulfillment-btn .icon { font-size: 1.4rem; }
+  .fulfillment-btn.active {
+    border-color: #3a7bfd;
+    background: rgba(58,123,253,0.08);
+    color: #3a7bfd;
+  }
+
+  .form-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #eef0f4;
+    font-size: 0.88rem;
+    color: #9aa3b2;
+  }
+  .form-item:last-child { border-bottom: none; }
+  .form-item .chev { color: #9aa3b2; }
+
+  .promo-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .promo-apply {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1.5px solid #1f3a5f;
+    color: #1f3a5f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+  }
+
+  .submit-btn {
+    display: block;
+    width: calc(100% - 32px);
+    margin: 8px 16px 24px;
+    background: #1f3a5f;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <span class="back-btn">‹</span>
+    <span class="page-title">Order summary</span>
+  </div>
+
+  <div class="card">
+    <h3 class="section-title">Order Details:</h3>
+    <div class="order-line">
+      <span class="line-name">EXtreme</span>
+      <span class="line-qty">x 2</span>
+      <span class="line-price">20,000 EGP</span>
+    </div>
+    <div class="order-line">
+      <span class="line-name">Fast Pack Pro</span>
+      <span class="line-qty">x 1</span>
+      <span class="line-price">14,000 EGP</span>
+    </div>
+    <div class="total-row">
+      <span>Total Price:</span>
+      <span class="total-value">34,000 EGP</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="section-title">Receive Order Via:</h3>
+    <div class="fulfillment-options">
+      <div class="fulfillment-btn">
+        <span class="icon">🏢</span>
+        Receive from Company
+      </div>
+      <div class="fulfillment-btn active">
+        <span class="icon">🚴</span>
+        Delivery
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="section-title">Your Delivery Address:</h3>
+    <div class="form-item">
+      <span>City</span>
+      <span class="chev">▾</span>
+    </div>
+    <div class="form-item">
+      <span>Apartment / Building / Street</span>
+    </div>
+    <div class="form-item">
+      <span>Select Location on Google Map</span>
+      <span class="chev">📍</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="promo-row">
+      <span class="form-item" style="border-bottom:none; padding:0;">Enter PromoCode</span>
+      <div class="promo-apply">✔</div>
+    </div>
+  </div>
+
+  <button class="submit-btn">SUBMIT</button>
+
+</div>
+</body>
+</html>
