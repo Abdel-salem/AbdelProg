@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flexera - Info Preview</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f4f6fb;
+    color: #1f2430;
+  }
+  .app {
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #f4f6fb;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 16px 6px;
+  }
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1f2430;
+    font-size: 1.1rem;
+  }
+  .brand {
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+  }
+  .brand .accent { color: #3a7bfd; }
+
+  .hero-card {
+    margin: 10px 16px;
+    background: linear-gradient(135deg, #1f3a5f, #3a7bfd);
+    border-radius: 18px;
+    padding: 26px 20px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 14px rgba(31,58,95,0.25);
+  }
+  .hero-logo {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 1.8rem;
+  }
+  .hero-title {
+    margin: 0 0 6px;
+    font-weight: 800;
+    font-size: 1.3rem;
+  }
+  .hero-sub {
+    margin: 0;
+    font-size: 0.82rem;
+    opacity: 0.9;
+  }
+
+  .card {
+    margin: 12px 16px;
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    margin: 0 0 10px;
+    font-weight: 700;
+    font-size: 0.98rem;
+    color: #1f3a5f;
+  }
+  .card-text {
+    margin: 0;
+    font-size: 0.84rem;
+    color: #6b7280;
+    line-height: 1.55;
+  }
+
+  .contact-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eef0f4;
+  }
+  .contact-row:last-child { border-bottom: none; }
+  .contact-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(58,123,253,0.1);
+    color: #3a7bfd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .contact-text { font-size: 0.85rem; }
+  .contact-label { margin: 0; font-weight: 600; color: #1f2430; }
+  .contact-value { margin: 2px 0 0; color: #6b7280; font-size: 0.8rem; }
+
+  .social-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 6px 0 4px;
+  }
+  .social-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    background: #f4f6fb;
+  }
+
+  .footer-text {
+    text-align: center;
+    margin: 6px 0 18px;
+    font-size: 0.75rem;
+    color: #9aa3b2;
+  }
+  .footer-text .version { font-weight: 600; color: #6b7280; margin-bottom: 2px; }
+
+  .tab-bar {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-around;
+    background: white;
+    border-top: 1px solid #eef0f4;
+    padding: 10px 0 14px;
+  }
+  .tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.68rem;
+    color: #9aa3b2;
+  }
+  .tab-item.active { color: #3a7bfd; }
+  .tab-icon { font-size: 1.2rem; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="icon-btn">🛒</div>
+    <div class="brand">FLEX<span class="accent">ERA</span></div>
+    <div class="icon-btn">🔔</div>
+  </div>
+
+  <div class="hero-card">
+    <div class="hero-logo">⚡</div>
+    <p class="hero-title">Flexera</p>
+    <p class="hero-sub">Buy Now, Pay Later — for Dental & Medical Equipment</p>
+  </div>
+
+  <div class="card">
+    <h3 class="card-title">About Flexera</h3>
+    <p class="card-text">
+      Flexera is Egypt's installment platform for dental and medical professionals.
+      We partner with trusted suppliers to give you instant access to premium equipment,
+      with flexible monthly installment plans, transparent pricing, and zero hidden fees —
+      so you can upgrade your practice without the upfront cost.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3 class="card-title">Get in Touch</h3>
+    <div class="contact-row">
+      <div class="contact-icon">📍</div>
+      <div class="contact-text">
+        <p class="contact-label">Address</p>
+        <p class="contact-value">70 El-Tayaran St., in Front of Mogamaa El-Mohafza, Nasr City, Cairo, Egypt</p>
+      </div>
+    </div>
+    <div class="contact-row">
+      <div class="contact-icon">📞</div>
+      <div class="contact-text">
+        <p class="contact-label">Phone</p>
+        <p class="contact-value">01070031711</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="card-title">Follow Us</h3>
+    <div class="social-row">
+      <div class="social-icon">📘</div>
+      <div class="social-icon">💬</div>
+      <div class="social-icon">📷</div>
+      <div class="social-icon">✉️</div>
+    </div>
+  </div>
+
+  <div class="footer-text">
+    <p class="version">Version 2.0</p>
+    <p>© Copyright 2026 Flexera. All rights reserved.</p>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab-item"><span class="tab-icon">🏠</span>Home</div>
+    <div class="tab-item"><span class="tab-icon">🛍️</span>Marketplace</div>
+    <div class="tab-item"><span class="tab-icon">📜</span>History</div>
+    <div class="tab-item"><span class="tab-icon">👤</span>Profile</div>
+    <div class="tab-item active"><span class="tab-icon">ⓘ</span>Info</div>
+  </div>
+
+</div>
+</body>
+</html>
