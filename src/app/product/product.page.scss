@@ -1,0 +1,167 @@
+.brand-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--ion-color-dark);
+
+  .brand-accent {
+    color: var(--ion-color-primary, #3a7bfd);
+  }
+}
+
+.notification-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 0.6rem;
+  padding: 2px 5px;
+}
+
+.product-content {
+  --background: #f4f6fb;
+}
+
+.product-name {
+  text-align: center;
+  margin: 6px 0 12px;
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+.gallery-card {
+  margin: 0 16px 12px;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.gallery-image {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1a1d24;
+  aspect-ratio: 4 / 3;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.gallery-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d8dee8;
+    cursor: pointer;
+
+    &.active {
+      background: #1f3a5f;
+    }
+  }
+}
+
+.info-card {
+  margin: 0 16px 16px;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.original-price {
+  color: #9aa3b2;
+  text-decoration: line-through;
+  font-size: 0.85rem;
+}
+
+.price {
+  color: #1f3a5f;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.category {
+  margin: 0 0 4px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1f3a5f;
+}
+
+.tagline {
+  margin: 0 0 14px;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.feature-list {
+  margin: 0;
+  padding-left: 18px;
+
+  li {
+    font-size: 0.85rem;
+    color: #1f2430;
+    margin-bottom: 10px;
+    line-height: 1.35;
+
+    &::marker {
+      color: #3a7bfd;
+    }
+  }
+}
+
+.action-bar {
+  padding: 10px 16px calc(14px + env(safe-area-inset-bottom));
+  background: #f4f6fb;
+}
+
+.add-to-cart-btn {
+  --background: #1f3a5f;
+  --background-hover: #16314f;
+  --border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  height: 50px;
+}
+
+.quantity-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  height: 50px;
+  overflow: hidden;
+}
+
+.stepper-btn {
+  flex: 1;
+  height: 100%;
+  background: #1f3a5f;
+  color: white;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.quantity-value {
+  flex: 1;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #1f2430;
+}

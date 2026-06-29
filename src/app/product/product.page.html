@@ -1,0 +1,70 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button>
+        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+        <ion-badge *ngIf="cartCount > 0" color="danger" class="notification-badge">
+          {{ cartCount }}
+        </ion-badge>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title class="brand-title">
+      FLEX<span class="brand-accent">ERA</span>
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="product-content">
+  <h1 class="product-name">{{ product.name }}</h1>
+
+  <ion-card class="gallery-card">
+    <div class="gallery-image">
+      <img [src]="product.images[activeImageIndex]" alt="{{ product.name }}" />
+    </div>
+    <div class="gallery-dots">
+      <span
+        class="dot"
+        *ngFor="let image of product.images; let i = index"
+        [class.active]="i === activeImageIndex"
+        (click)="selectImage(i)"
+      ></span>
+    </div>
+  </ion-card>
+
+  <ion-card class="info-card">
+    <div class="price-row">
+      <span class="original-price">{{ product.originalPrice | number }} EGP</span>
+      <span class="price">{{ product.price | number }} EGP</span>
+    </div>
+
+    <h2 class="category">{{ product.category }}</h2>
+    <p class="tagline">{{ product.tagline }}</p>
+
+    <ul class="feature-list">
+      <li *ngFor="let feature of product.features">{{ feature }}</li>
+    </ul>
+  </ion-card>
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <div class="action-bar">
+    <ng-container *ngIf="!addedToCart">
+      <ion-button expand="block" class="add-to-cart-btn" (click)="addToCart()">
+        Add to Cart
+      </ion-button>
+    </ng-container>
+
+    <div class="quantity-stepper" *ngIf="addedToCart">
+      <button class="stepper-btn" (click)="decreaseQuantity()">-</button>
+      <span class="quantity-value">{{ quantity }}</span>
+      <button class="stepper-btn" (click)="increaseQuantity()">+</button>
+    </div>
+  </div>
+</ion-footer>

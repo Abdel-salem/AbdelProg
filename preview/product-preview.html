@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flexera - Product Preview</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f4f6fb;
+    color: #1f2430;
+  }
+  .app {
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #f4f6fb;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 16px 6px;
+  }
+  .icon-btn {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1f2430;
+    font-size: 1.1rem;
+  }
+  .badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #eb445a;
+    color: white;
+    font-size: 0.65rem;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+  .brand {
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+  }
+  .brand .accent { color: #3a7bfd; }
+
+  .product-name {
+    text-align: center;
+    margin: 6px 0 12px;
+    font-weight: 700;
+    font-size: 1.4rem;
+  }
+
+  .gallery-card {
+    margin: 0 16px 12px;
+    background: white;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .gallery-image {
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(160deg, #2b2f38, #15171c);
+    aspect-ratio: 4 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-size: 0.8rem;
+  }
+  .gallery-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d8dee8;
+  }
+  .dot.active { background: #1f3a5f; }
+
+  .info-card {
+    margin: 0 16px 16px;
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .original-price {
+    color: #9aa3b2;
+    text-decoration: line-through;
+    font-size: 0.85rem;
+  }
+  .price {
+    color: #1f3a5f;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  .category {
+    margin: 0 0 4px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1f3a5f;
+  }
+  .tagline {
+    margin: 0 0 14px;
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+  .feature-list {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .feature-list li {
+    font-size: 0.85rem;
+    color: #1f2430;
+    margin-bottom: 10px;
+    line-height: 1.35;
+  }
+  .feature-list li::marker { color: #3a7bfd; }
+
+  .action-bar {
+    margin-top: auto;
+    padding: 10px 16px 18px;
+    background: #f4f6fb;
+  }
+  .add-to-cart-btn {
+    display: block;
+    width: 100%;
+    background: #1f3a5f;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  .quantity-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    height: 50px;
+    overflow: hidden;
+  }
+  .stepper-btn {
+    flex: 1;
+    height: 100%;
+    background: #1f3a5f;
+    color: white;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .quantity-value {
+    flex: 1;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="icon-btn">🛒<span class="badge">3</span></div>
+    <div class="brand">FLEX<span class="accent">ERA</span></div>
+    <div class="icon-btn">🔔</div>
+  </div>
+
+  <h1 class="product-name">EXtreme</h1>
+
+  <div class="gallery-card">
+    <div class="gallery-image">Product Image</div>
+    <div class="gallery-dots">
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="price-row">
+      <span class="original-price">12,000 EGP</span>
+      <span class="price">10,000 EGP</span>
+    </div>
+    <h2 class="category">Cordless Endomotor</h2>
+    <p class="tagline">Smaller | Lighter | Quieter than ever</p>
+    <ul class="feature-list">
+      <li>Mini Head for More Comfortable & accessible Experience</li>
+      <li>Contra-angle rotation 360°</li>
+      <li>Slim and compact design for maximum comfort and mobility</li>
+      <li>Miniature contra-angle for better visibility & easier posterior access</li>
+      <li>Normal head & neck</li>
+    </ul>
+  </div>
+
+  <div class="action-bar">
+    <div class="quantity-stepper">
+      <button class="stepper-btn">−</button>
+      <span class="quantity-value">2</span>
+      <button class="stepper-btn">+</button>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
